@@ -1,3 +1,9 @@
+from flask import Flask, render_template, jsonify, request
+from modules.commands import perform_web_search, open_application, play_media
+from modules.spotify_integration import play_spotify_track
+from modules.youtube_integration import play_youtube_video
+from voice.speech_to_text import recognize_speech
+from voice.text_to_speech import speak
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -93,6 +99,60 @@ def play_media():
         os.system('start movie.mp4')  # Adjust with actual media file path or player
         return 'Playing movie...'
     return 'Media not recognized.'
+
+@app.route('/voice/command', methods=['GET'])
+def voice_command():
+    # Get the voice command via speech recognition
+    command = recognize_speech()
+    
+    if command:
+        # Respond with speech (Text-to-Speech)
+        speak(f"You said: {command}")
+        
+        # Return the command as JSON response
+        return jsonify({"command": command})
+    else:
+        return jsonify({"command": None})
+
+@app.route('/action/search', methods=['GET'])
+def search():
+    query = request.args.get('q')
+    if query:
+        perform_web_search(query)
+        return jsonify({"status": "success"})
+    return jsonify({"status": "failure"})
+
+@app.route('/action/open', methods=['GET'])
+def open():
+    app_name = request.args.get('app')
+    if app_name:
+        open_application(app_name)
+        return jsonify({"status": "success", "app": app_name})
+    return jsonify({"status": "failure"})
+
+@app.route('/action/play', methods=['GET'])
+def play():
+    media_name = request.args.get('media')
+    if media_name:
+        play_media(media_name)
+        return jsonify({"status": "success", "media": media_name})
+    return jsonify({"status": "failure"})
+
+app.route('/action/play/spotify', methods=['GET'])
+def play_spotify():
+    track_name = request.args.get('track')
+    if track_name:
+        play_spotify_track(track_name)
+        return jsonify({"status": "success", "track": track_name})
+    return jsonify({"status": "failure"})
+
+@app.route('/action/play/youtube', methods=['GET'])
+def play_youtube():
+    video_url = request.args.get('url')
+    if video_url:
+        play_youtube_video(video_url)
+        return jsonify({"status": "success", "video": video_url})
+    return jsonify({"status": "failure"})
 
 if __name__ == '__main__':
     app.run(debug=True)

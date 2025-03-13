@@ -3,33 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Personal Assistant</title>
+    <title>Personal Assistant Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="container">
         <header>
-            <h1>Welcome, {{ current_user.username }}!</h1>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <h1>Welcome to Your Personal Assistant, {{ current_user.username }}!</h1>
+            <button id="logout" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+            <button id="modeToggle" onclick="toggleMode()">
+                <img id="modeIcon" src="{{ url_for('static', filename='assets/icons/sun.png') }}" alt="Mode Icon">
+            </button>
         </header>
 
-        <!-- Dark/Light Mode Toggle -->
-        <button id="mode-toggle">
-            <img src="{{ url_for('static', filename='assets/icons/sun.png') }}" alt="Toggle Light/Dark">
-        </button>
-
-        <div class="task-buttons">
-            <h2>Control Your Assistant</h2>
-            <button class="task-button" id="web-search-btn">Web Search</button>
-            <button class="task-button" id="open-app-btn">Open Application</button>
-            <button class="task-button" id="play-media-btn">Play Media</button>
-        </div>
-
-        <!-- Voice Control Section -->
-        <div class="voice-control">
-            <button id="voice-command-btn">Start Voice Command</button>
-        </div>
+        <section id="control-panel">
+            <button class="task-button" onclick="performAction('search')">Search the Web</button>
+            <button class="task-button" onclick="performAction('open')">Open App (Browser)</button>
+            <button class="task-button" onclick="performAction('play')">Play Media</button>
+            <button class="task-button" onclick="startVoiceControl()">Voice Control</button>
+        </section>
     </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

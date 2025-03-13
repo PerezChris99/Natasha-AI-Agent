@@ -69,3 +69,96 @@ function playMedia(command) {
         alert('Media not recognized.');
     }
 }
+
+// Function to start voice control
+function startVoiceControl() {
+    // Show a message while listening
+    alert("Listening for your command...");
+
+    // Call Flask route to process speech-to-text
+    fetch('/voice/command')
+        .then(response => response.json())
+        .then(data => {
+            const command = data.command;
+            if (command) {
+                alert(`You said: ${command}`);
+                processVoiceCommand(command);
+            } else {
+                alert("Sorry, I didn't catch that.");
+            }
+        });
+}
+
+// Process the voice command
+function processVoiceCommand(command) {
+    if (command.includes("search")) {
+        const query = command.replace("search", "").trim();
+        performAction('search', query);
+    } else if (command.includes("open")) {
+        const app = command.replace("open", "").trim();
+        performAction('open', app);
+    } else if (command.includes("play")) {
+        const media = command.replace("play", "").trim();
+        performAction('play', media);
+    } else {
+        alert("Sorry, I couldn't understand that command.");
+    }
+}
+
+function performAction(action, data) {
+    if (action === 'search') {
+        fetch(`/action/search?q=${data}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert("Search complete!");
+                } else {
+                    alert("Search failed.");
+                }
+            });
+    } else if (action === 'open') {
+        fetch(`/action/open?app=${data}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`${data.app} is now open!`);
+                } else {
+                    alert("Failed to open the application.");
+                }
+            });
+    } else if (action === 'play') {
+        fetch(`/action/play?media=${data}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`Playing media: ${data.media}`);
+                } else {
+                    alert("Failed to play media.");
+                }
+            });
+    }
+}
+
+function playSpotifyTrack(trackName) {
+    fetch(`/action/play/spotify?track=${trackName}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(`Now playing on Spotify: ${data.track}`);
+            } else {
+                alert("Failed to play track.");
+            }
+        });
+}
+
+function playYouTubeVideo(url) {
+    fetch(`/action/play/youtube?url=${url}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(`Now playing video: ${data.video}`);
+            } else {
+                alert("Failed to play video.");
+            }
+        });
+}
