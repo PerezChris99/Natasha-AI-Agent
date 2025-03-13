@@ -1,10 +1,16 @@
-from flask import Flask, render_template, jsonify, request
+import os
+# Add dotenv loading at the top
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
+
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 from modules.commands import perform_web_search, open_application, play_media
 from modules.spotify_integration import play_spotify_track
 from modules.youtube_integration import play_youtube_video
 from voice.speech_to_text import recognize_speech
 from voice.text_to_speech import speak
-from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -156,3 +162,10 @@ def play_youtube():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    # Test Spotify integration
+    try:
+        play_spotify_track("Bohemian Rhapsody", "Queen")
+    except Exception as e:
+        print(f"Error during Spotify playback test: {e}")
+        print("Please check your Spotify credentials in config/spotify_config.py or .env file")
